@@ -1,10 +1,20 @@
-# Missing People Face Detection:
+# Missing People Face Detection
+This is a project using InsightFace model to detect missing people which is based on the CNN deep learning algorithm.
 
-## Running the demo:
-## I) First: 
-Install the model and add it to the demo folder, here's the link to it:  [here](https://drive.google.com/file/d/1FPldzmZ6jHfaC-R-jLkxvQRP-cLgxjCT/view)
+## Running the Demo
 
-## I) Next:
-** 1- Navigate to the `demo` folder: `cd demo` **
-** 2- Install the dependencies using pip from the `requirements.txt` file:`cd demo` **
-** 3- Run streamlit on the main script:`streamlit run main.py` **
+### Step 1: Install the Model
+- Download the model and add it to the `demo` folder. You can find the model [here](https://drive.google.com/file/d/1FPldzmZ6jHfaC-R-jLkxvQRP-cLgxjCT/view).
+
+### Step 2: Set Up the Demo
+1. Navigate to the `demo` folder:
+   ```bash
+   cd demo
+
+2. Install the dependencies using `pip` from the `requirements.txt` file:
+   ```bash
+   pip install -r requirements.txt
+
+3. Run Streamlit on the main script:
+   ```bash
+   streamlit run main.py
