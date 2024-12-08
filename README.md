@@ -8,13 +8,14 @@ This is a project using InsightFace model to detect missing people which is base
 .
 
 ### Step 2: Set Up the Demo
-1. Navigate to the `demo` folder:
-   ```bash
-   cd demo
 
-2. Install the dependencies using `pip` from the `requirements.txt` file:
+1. Install the dependencies using `pip` from the `requirements.txt` file:
    ```bash
    pip install -r requirements.txt
+
+2. Navigate to the `demo` folder:
+   ```bash
+   cd demo
 
 3. Run Streamlit on the main script:
    ```bash
