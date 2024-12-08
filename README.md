@@ -1,5 +1,5 @@
 # Missing People Face Detection
-This is a project using InsightFace model to detect missing people which is based on the CNN deep learning algorithm.
+This is a project using InsightFace model to detect missing people which is based on the CNN deep learning algorithm. We have provided some random people pictures you can use to see if they are missing or not.
 
 ## Running the Demo
 
