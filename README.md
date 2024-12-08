@@ -7,7 +7,18 @@ This is a project using InsightFace model to detect missing people which is base
 - Download the model and add it to the `demo` folder. You can find the model <a href="https://drive.google.com/file/d/1FPldzmZ6jHfaC-R-jLkxvQRP-cLgxjCT/view" target="_blank">here</a>
 .
 
-### Step 2: Set Up the Demo
+### Step 2: Create virtual environment 
+
+1. Create the python virtual environment using:
+   ```bash
+   python3 -m venv venv-name
+
+2. Activate it using:
+   ```bash
+   source venv-name/bin/activate
+
+
+### Step 3: Set Up the Demo
 
 1. Install the dependencies using `pip` from the `requirements.txt` file:
    ```bash
