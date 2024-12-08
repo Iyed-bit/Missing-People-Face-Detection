@@ -1,24 +1,23 @@
+import numpy as np
+from insightface.app import FaceAnalysis
 
-def process_images(img1, img2, detector, app):
 
-  """
-  Calculate the similarity score between the two images.
+def process_image_with_collection(uploaded_img, stored_embeddings, app):
+    """
+    Compare the uploaded image against a collection of stored images.
 
-  Args:
-    image1_path : str, path of first image
-    image1_path : str, path of second image
+    Args:
+        uploaded_img: numpy array of the uploaded image.
+        stored_embeddings: dict of {filename: embedding} for stored images.
+        app: InsightFace app instance.
 
-  Returns:
-    float, similarity score
-
-  """
-
-  # to prepare images
-
-  faces_1 = app.get(img1)[0]['embedding']
-  faces_2 = app.get(img2)[0]['embedding']
-
-  score =  detector.compute_sim(faces_1, faces_2)
-  # to compare image similarity
-  print(f'Similarity score: {score}')
-  return score
+    Returns:
+        List of tuples (filename, similarity_score), sorted by similarity in descending order.
+    """
+    uploaded_embedding = app.get(uploaded_img)[0]['embedding']
+    results = []
+    for filename, stored_embedding in stored_embeddings.items():
+        score = np.dot(uploaded_embedding, stored_embedding)  # Cosine similarity
+        results.append((filename, score))
+    results.sort(key=lambda x: x[1], reverse=True)  # Sort by score descending
+    return results
