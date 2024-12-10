@@ -4,101 +4,76 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 from insightface.app import FaceAnalysis
-from model import process_image_with_collection
+from numpy.linalg import norm
 
+# Cache model to avoid reloading it each time
 @st.cache_resource
 def app_model():
     app = FaceAnalysis()
     app.prepare(ctx_id=-1)
     return app
 
+# Load stored embeddings and person information
 @st.cache_resource
-def load_stored_images(directory="../subscribed-people/"):
+def load_stored_embeddings(directory="../subscribed-people/"):
     embeddings = {}
     app = app_model()
-    
-    # Iterate through each folder (representing a person)
-    for person_folder in os.listdir(directory):
-        person_folder_path = os.path.join(directory, person_folder)
-        
+
+    for folder_name in os.listdir(directory):
+        person_folder_path = os.path.join(directory, folder_name)
+
         if os.path.isdir(person_folder_path):
-            # Load all images within this folder
             for filename in os.listdir(person_folder_path):
                 if filename.lower().endswith(('.jpg', '.png', '.jpeg', '.jfif')):
                     filepath = os.path.join(person_folder_path, filename)
                     image = np.asarray(Image.open(filepath))
-                    
-                    embedding = app.get(image)[0]['embedding']
-                    embeddings[filename] = embedding  
-    
+                    faces = app.get(image)
+
+                    if faces:
+                        embedding = faces[0]['embedding'] / norm(faces[0]['embedding'])
+                        info = {}
+                        info_path = os.path.join(person_folder_path, "info.json")
+                        if os.path.exists(info_path):
+                            with open(info_path, "r") as f:
+                                info = json.load(f)
+
+                        embeddings[folder_name] = (embedding, info)
+                    break
     return embeddings
 
-# Load person metadata (name, age, etc...)
-def load_person_info(person_folder):
-    """
-    Loads the information of a person from the info.json file in their folder.
+# Find best match based on cosine similarity
+def find_best_match(uploaded_embedding, stored_embeddings, threshold=0.45):
+    best_match, best_score, best_info = None, 0, None
 
-    Args:
-        person_folder: The folder where the person's images and info.json are stored.
+    for folder_name, (stored_embedding, info) in stored_embeddings.items():
+        score = np.dot(uploaded_embedding, stored_embedding)
+        if score > best_score and score >= threshold:
+            best_match, best_score, best_info = folder_name, score, info
 
-    Returns:
-        dict: The data from the info.json file or None if not found.
-    """
-    # Path to the person's info.json file
-    info_file_path = os.path.join(person_folder, "info.json")
-    
-    if os.path.exists(info_file_path):
-        with open(info_file_path, "r") as f:
-            return json.load(f)
-    return None
+    return best_match, best_score, best_info
 
-st.title("Missing People Face Detection")
+# Streamlit UI
+st.title("Face Recognition App")
 
-stored_embeddings = load_stored_images()
+# Load stored embeddings
+stored_embeddings = load_stored_embeddings()
 
-# Upload a single image for comparison
-uploaded_file = st.file_uploader("Please upload an image file", type=["jpg", "png", "jpeg", "jfif"])
+# File uploader
+uploaded_file = st.file_uploader("Please upload an image file", type=["jpg", "png", "jpeg", "jfif", "webp"])
 
 if uploaded_file:
     st.image(uploaded_file)
 
-if st.button("Predict"):
-    if not uploaded_file:
-        st.error("Please upload an image file.")
-    else:
-        # Convert uploaded image to numpy array
-        uploaded_image = np.asarray(Image.open(uploaded_file))
-        
-        # Process the uploaded image against the stored embeddings
-        matches = process_image_with_collection(uploaded_image, stored_embeddings, app_model())
-        
-        if matches:
-            # Get the best match
-            best_match, score = matches[0]
-            st.success("Missing person detected!")
-            
-            # Extract the folder name (remove file extension from best match)
-            person_folder_name = os.path.splitext(best_match)[0]  # Get the folder name (without .jpg or extension)
-            person_folder = os.path.join("../subscribed-people", person_folder_name)
-            
-            # Load additional details from the person's info.json file
-            person_info = load_person_info(person_folder)
-            
-            if person_info:
-                st.subheader("Person Information:")
-                st.markdown(f"**Name**: {person_info['name']}")
-                st.write(f"**Age**: {person_info['age']}")
-                st.write(f"**Last known location:** {person_info['last_known_location']}")
-                st.write(f"**Missing since:** {person_info['missing_since']}")
-                st.write(f"**Additional details:** {person_info['other_details']}")
-                st.write(f"**Contact:** {person_info['contact']}")
+# Process uploaded file
+                st.metric("Similarity Score", f"{score:.2f}")
 
-                matched_image_path = os.path.join(person_folder, best_match)  
-                if os.path.exists(matched_image_path):
-                    st.image(matched_image_path, caption="Matched Person", use_container_width=True)
-                else:
-                    st.warning("Image not found for this person.")
+                # Display matched image
+                matched_image_path = os.path.join("../subscribed-people", best_match)
+                for file in os.listdir(matched_image_path):
+                    if file.lower().endswith(('.jpg', '.png', '.jpeg', '.jfif')):
+                        st.image(os.path.join(matched_image_path, file), caption="Matched Image")
+                        break
             else:
-                st.warning("No additional information available for this person.")
+                st.warning("No matches found with similarity score above 50%.")
         else:
-            st.warning("No matches found.")
+            st.warning("No face detected in the uploaded image.")
