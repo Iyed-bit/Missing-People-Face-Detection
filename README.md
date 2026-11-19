@@ -1,5 +1,13 @@
 # Missing People Face Detection
-This is a project using InsightFace model to detect missing people which is based on the CNN deep learning algorithm. We have provided some random people pictures you can use to see if they are missing or not.
+This project explores how facial recognition can support missing-person searches by comparing uploaded photos with reference images in a sample dataset. It uses InsightFace and CNN-based deep-learning models to detect and compare faces, surfacing potential matches for human review rather than confirming identity.
+
+## How the Service Could Work
+
+People who may be at risk of becoming lost, such as people living with dementia, could register with the organization in advance. With appropriate consent, the organization would keep recent photos and contact details for a trusted family member or caregiver.
+
+If someone is reported missing, or a found person cannot be identified, authorized responders could compare an available photo with enrolled profiles. Potential matches could guide search and reconnection efforts and should be confirmed before details are shared.
+
+This demo illustrates photo comparison using a local sample dataset; enrollment and secure profile management are part of the broader concept.
 
 ## Running the Demo
 
@@ -31,3 +39,6 @@ This is a project using InsightFace model to detect missing people which is base
 3. Run Streamlit on the main script:
    ```bash
    streamlit run main.py
+   ```
+
+4. In the Streamlit page, click **Upload an image** and choose a sample photo from the project's `random-people/` folder to try the demo.
