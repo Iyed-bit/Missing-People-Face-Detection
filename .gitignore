@@ -1,0 +1,20 @@
+# Virtual environments
+myvenv/
+venv/
+venv-name/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Model files
+*.onnx
+*.pth
+*.pt
+*.h5
+*.pkl
+
+# Environment variables
+.env
+.env.*
